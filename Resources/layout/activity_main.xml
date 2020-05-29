@@ -1,0 +1,38 @@
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:minWidth="25px"
+    android:minHeight="25px"
+    android:id="@+id/linearLayout1">
+    <TextView
+        android:text="Text"
+        android:layout_width="142.5dp"
+        android:layout_height="35.5dp"
+        android:minWidth="25px"
+        android:minHeight="25px"
+        android:textStyle="bold"
+        android:id="@+id/tvAppName"
+        android:textSize="24dp" />
+    <Button
+        android:text="Voice 01"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/btnVoice01"
+        android:layout_margin="25px"/>
+    <Button
+        android:text="Voice 02"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/btnVoice02"
+        android:layout_margin="25px"/>
+    <TextView
+        android:text="Text"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/tvInfo" />
+</LinearLayout>
