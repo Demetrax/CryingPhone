@@ -19,12 +19,15 @@ namespace CryingPhone
     [Activity(Label = "@string/app_name", Theme = "@style/AppTheme", MainLauncher = true)]
     public class MainActivity : AppCompatActivity
     {
+
+        #region VAR
         // UI Control
         TextView tvAppName;
         TextView tvInfo;
 
         Button btnVoice01;
         Button btnVoice02;
+        Button btnVoiceOff;
 
         // Media Player
         MediaPlayer mediaPlayer;
@@ -37,6 +40,9 @@ namespace CryingPhone
         public List<int> voice1;
         public List<int> voice2;
         public List<int> voiceChoose;
+
+        // Text Array
+        public List<string> alternativeText;
 
         // Timer
         public Timer mainTimer;
@@ -56,19 +62,25 @@ namespace CryingPhone
         private GyroscopeReader gyroscopeReader = new GyroscopeReader();
 
         // Const
-        public const int timerSpeed = 500;
+        public const int timerSpeed = 250;
         public const int rollSensitivity = 45;
+        public const int timeForWell = 10;
 
         // Start Datetime
         public DateTime startTimeRoll;
         public DateTime startTimeWalk;
+        public DateTime startTimeGame;
 
+        // Status
         public bool gameAlreadyLaunch = false;
-        public int timeForWell = 10;
+        public bool soundOff = false;
+        
 
-        public int onCreateCount = 0;
+        // Debug
         public int nbChangeState = 0;
         public int nbGame = 0;
+
+        #endregion
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -77,13 +89,11 @@ namespace CryingPhone
             // Set our view from the "main" layout resource
             SetContentView(Resource.Layout.activity_main);
 
-            onCreateCount++;
-            Console.WriteLine("---------------------------------------------------" + onCreateCount + "-----------------------------------------");
             tvAppName = FindViewById<TextView>(Resource.Id.tvAppName);
-            tvAppName.Text = "Crying Phone `with state machine` ;) '";
+            tvAppName.Text = "THE FABULOUS CRYING PHONE !";
 
             tvInfo = FindViewById<TextView>(Resource.Id.tvInfo);
-            tvInfo.Text = "La voie 1 est sélectionné par défaut, Bouger le téléphone pour commencer";
+            tvInfo.Text = "La voie 1 est sélectionnée par défaut, Bouger le téléphone pour commencer. Une partie dure minimum 20 sec, a la fin d'une partie, secoué le téléphone pour rejouer";
 
             btnVoice01 = FindViewById<Button>(Resource.Id.btnVoice01);
             btnVoice01.Click += BtnVoice01_Click;
@@ -91,9 +101,12 @@ namespace CryingPhone
             btnVoice02 = FindViewById<Button>(Resource.Id.btnVoice02);
             btnVoice02.Click += BtnVoice02_Click;
 
+            btnVoiceOff = FindViewById<Button>(Resource.Id.btnVoiceOff);
+            btnVoiceOff.Click += BtnVoiceOff_Click;
+
             if (!gameAlreadyLaunch)
             {
-                initVoice();
+                InitVoice();
 
                 accelerometerReader.ToggleAccelerometer();
                 orientationReader.ToggleOrientationSensor();
@@ -107,6 +120,7 @@ namespace CryingPhone
             }
         }
 
+
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
         {
             Xamarin.Essentials.Platform.OnRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -115,11 +129,12 @@ namespace CryingPhone
 
         }
 
-        private void initVoice()
+        private void InitVoice()
         {
             voice1 = new List<int>();
             voice2 = new List<int>();
             voiceChoose = new List<int>();
+            alternativeText = new List<string>();
 
             voice1.Add(Resource.Raw.Voice01_01);
             voice1.Add(Resource.Raw.Voice01_02);
@@ -131,6 +146,17 @@ namespace CryingPhone
             voice1.Add(Resource.Raw.Voice01_08);
             voice1.Add(Resource.Raw.Voice01_09);
             voice1.Add(Resource.Raw.Voice01_10);
+
+            alternativeText.Add("Peux tu me transporter sans me pencher, ni me faire tomber. Attention ca commence :=)");
+            alternativeText.Add("Aaaah");
+            alternativeText.Add("Aaaaaaaaaah, ca peeeeeeenche ! :/");
+            alternativeText.Add("Oooooooooooh, Encore je vais vomir Oo");
+            alternativeText.Add("Aieueu ! X_X");
+            alternativeText.Add("Eh !! ca fait mal ! X_X");
+            alternativeText.Add("Aieueuueueu !! snif snif tu ma fait mal ! X_X");
+            alternativeText.Add("Humm Waouhh");
+            alternativeText.Add("Waouhh tu es presque aussi doué que Fabio Lanzoni ;)");
+            alternativeText.Add("Merci, tu es vraiment trop fort ! et trés beau ce qui ne gache rien ! <(^^,)>");
 
             voice2.Add(Resource.Raw.Voice02_01);
             voice2.Add(Resource.Raw.Voice02_02);
@@ -146,12 +172,6 @@ namespace CryingPhone
             voiceChoose = voice1;
         }
 
-        public async void Delay3s()
-        {
-            Console.WriteLine("Delay3s()");
-            await Task.Delay(3000);
-
-        }
 
         // Create and configure State Machine
         public void CreateStateMachine()
@@ -185,14 +205,8 @@ namespace CryingPhone
             stateMachine.OnTransitioned(onTransitionAction);
         }
 
-        private void onTransitionAction(StateMachine<StateMach, Trigger>.Transition obj)
-        {
-            Console.WriteLine("Changement Etat " + stateMachine.State);
-            Console.WriteLine("nombre Changement Etat " + nbChangeState);
-            nbChangeState++;
-        }
 
-        #region button event
+        #region BUTTON_EVENT
 
         private void BtnVoice02_Click(object sender, EventArgs e)
         {
@@ -204,6 +218,19 @@ namespace CryingPhone
             voiceChoose = voice1;
         }
 
+        private void BtnVoiceOff_Click(object sender, EventArgs e)
+        {
+            am.SetStreamMute(Stream.Music, !am.IsStreamMute(Stream.Music));
+            soundOff = !soundOff;
+            if (soundOff)
+            {
+                btnVoiceOff.Text = "VOICE ON";
+            } else
+            {
+                btnVoiceOff.Text = "VOICE OFF";
+            }
+        }
+
         #endregion
 
 
@@ -213,7 +240,7 @@ namespace CryingPhone
             {
 
                 gameAlreadyLaunch = true;
-                Console.WriteLine("66666666666666666666666666666666666666666666666 Main Loop 66666666666666666666666666666666666666666666666666666666");
+                Console.WriteLine("Main Loop");
                 mainTimer = new Timer();
                 mainTimer.Start();
                 mainTimer.Interval = timerSpeed;
@@ -221,10 +248,9 @@ namespace CryingPhone
 
                 mainTimer.Elapsed += MainTimerLoop;
             }
-            
         }
 
-        #region Timer Loop
+        #region TIMER_LOOP
 
         private void MainTimerLoop(object sender, ElapsedEventArgs e)
         {
@@ -245,20 +271,19 @@ namespace CryingPhone
                     gyroscopeReader.ToggleGyroscope();
                 }
 
-                if (((Math.Abs(gyroscopeReader.gyroX) + Math.Abs(gyroscopeReader.gyroY) + Math.Abs(gyroscopeReader.gyroZ)) > 3) && !am.IsMusicActive && nbGame < 1)
+                if (((Math.Abs(gyroscopeReader.gyroX) + Math.Abs(gyroscopeReader.gyroY) + Math.Abs(gyroscopeReader.gyroZ)) > 5) && !am.IsMusicActive)
                 {
                     //Game Start
                     Console.WriteLine("---------------------------The Game Begin-------------------------------------");
-                    if (!am.IsMusicActive && nbGame<1)
-                    {
-                        nbGame++;
-                        Console.WriteLine("---------------------------+++++++++++++++++++++++-------------------------------------" + nbGame);
-                        mainTimer.Stop();
-                        mainTimer.Enabled = false;
-                        mediaPlayer = MediaPlayer.Create(this, voiceChoose[0]);
-                        mediaPlayer.Start();
-                        stateMachine.Fire(Trigger.Go);
-                    }
+
+                    nbGame++;
+                    mainTimer.Stop();
+                    mainTimer.Enabled = false;
+                    mediaPlayer = MediaPlayer.Create(this, voiceChoose[0]);
+                    tvInfo.Text = alternativeText[0];
+                    mediaPlayer.Start();
+                    startTimeGame = DateTime.Now;
+                    stateMachine.Fire(Trigger.Go);
                 }
             });
         }
@@ -269,40 +294,46 @@ namespace CryingPhone
                 // Check if audio is not playing
                 if (!am.IsMusicActive)
                 {
+                    TimeSpan gameDuration = e.SignalTime - startTimeGame;
                     // Detect Shock
                     if (accelerometerReader.shacked)
                     {
                         stateMachine.Fire(Trigger.Shocking);
                     }
-
                     // Detect roll or pitch
-                    if (PitchOrRoll())
-                    {
+                    else if (PitchOrRoll()) {
                         stateMachine.Fire(Trigger.Rolling);
-                    }
-
-                    // Check time for well
-                    TimeSpan nbTime = e.SignalTime - startTimeRoll;
-                    if (nbTime.Seconds > timeForWell && lastWell != 2)
-                    {
-                        mediaPlayer = MediaPlayer.Create(this, voiceChoose[8]);
-                        mediaPlayer.Start();
-                        lastWell = 2;
                     } 
-                    else if (nbTime.Seconds > timeForWell/2 && lastWell != 1)
-                    {
-                        mediaPlayer = MediaPlayer.Create(this, voiceChoose[7]);
-                        mediaPlayer.Start();
-                        lastWell = 1;
-                    }
-
                     // Detect End
-                    if (OnTable())
+                    else if (OnTable() && (gameDuration.Seconds > 20))
                     {
                         stateMachine.Fire(Trigger.Finish);
                     }
-                }
+                    // Check time for well
+                    else
+                    {
+                        TimeSpan nbTime = e.SignalTime - startTimeWalk;
+                        if (nbTime.Seconds > timeForWell && lastWell != 2)
+                        {
 
+                            mediaPlayer = MediaPlayer.Create(this, voiceChoose[8]);
+                            tvInfo.Text = alternativeText[8];
+                            mediaPlayer.Start();
+                            lastWell = 2;
+                            startTimeWalk = DateTime.Now;
+                        }
+                        else if (nbTime.Seconds > timeForWell / 2 && lastWell != 1)
+                        {
+
+                            mediaPlayer = MediaPlayer.Create(this, voiceChoose[7]);
+                            tvInfo.Text = alternativeText[7];
+                            mediaPlayer.Start();
+                            lastWell = 1;
+                            startTimeWalk = DateTime.Now;
+
+                        }
+                    }
+                }
             });
         }
 
@@ -315,48 +346,53 @@ namespace CryingPhone
                 if (accelerometerReader.shacked && !am.IsMusicActive)
                 {
                     stateMachine.Fire(Trigger.Shocking);
-                }
-
-                double pitch = 180 * Math.Atan(accelerometerReader.accX / Math.Sqrt(accelerometerReader.accY * accelerometerReader.accY + accelerometerReader.accZ * accelerometerReader.accZ)) / Math.PI;
-                double roll = 180 * Math.Atan(accelerometerReader.accY / Math.Sqrt(accelerometerReader.accX * accelerometerReader.accX + accelerometerReader.accZ * accelerometerReader.accZ)) / Math.PI;
-
-                double newRoll = (Math.Abs(pitch) + Math.Abs(roll)) + 25;
-
-                DateTime stopTime = e.SignalTime;
-                TimeSpan nbTime = stopTime - startTimeRoll;
-
-                if (nbTime.Seconds > 5)
+                } else
                 {
-                    rollCount++;
-                    switch (rollCount) 
+                    double pitch = 180 * Math.Atan(accelerometerReader.accX / Math.Sqrt(accelerometerReader.accY * accelerometerReader.accY + accelerometerReader.accZ * accelerometerReader.accZ)) / Math.PI;
+                    double roll = 180 * Math.Atan(accelerometerReader.accY / Math.Sqrt(accelerometerReader.accX * accelerometerReader.accX + accelerometerReader.accZ * accelerometerReader.accZ)) / Math.PI;
+
+                    double newRoll = (Math.Abs(pitch) + Math.Abs(roll)) + 25;
+
+                    DateTime stopTime = e.SignalTime;
+                    TimeSpan nbTime = stopTime - startTimeRoll;
+
+                    if (nbTime.Seconds > 5 && !am.IsMusicActive)
                     {
-                        case 1:
-                            mediaPlayer = MediaPlayer.Create(this, voiceChoose[2]);
-                            mediaPlayer.Start();
-                            stateMachine.Fire(Trigger.RollOver);
-                            break;
-                        case 2:
-                            mediaPlayer = MediaPlayer.Create(this, voiceChoose[3]);
-                            mediaPlayer.Start();
-                            stateMachine.Fire(Trigger.RollOver);
-                            break;
+                        rollCount++;
+                        switch (rollCount)
+                        {
+                            case 1:
+                                mediaPlayer = MediaPlayer.Create(this, voiceChoose[2]);
+                                tvInfo.Text = alternativeText[2];
+                                mediaPlayer.Start();
+                                stateMachine.Fire(Trigger.RollOver);
+                                break;
+                            case 2:
+                                mediaPlayer = MediaPlayer.Create(this, voiceChoose[3]);
+                                tvInfo.Text = alternativeText[3];
+                                mediaPlayer.Start();
+                                stateMachine.Fire(Trigger.RollOver);
+                                break;
+                        }
                     }
-                } 
-                else if (newRoll < rollSensitivity)
-                {
-                    rollCount++;
-                    switch (rollCount)
+                    else if (newRoll < rollSensitivity && !am.IsMusicActive)
                     {
-                        case 1:
-                            mediaPlayer = MediaPlayer.Create(this, voiceChoose[1]);
-                            mediaPlayer.Start();
-                            stateMachine.Fire(Trigger.RollOver);
-                            break;
-                        case 2:
-                            mediaPlayer = MediaPlayer.Create(this, voiceChoose[3]);
-                            mediaPlayer.Start();
-                            stateMachine.Fire(Trigger.RollOver);
-                            break;
+                        rollCount++;
+                        switch (rollCount)
+                        {
+                            case 1:
+                                mediaPlayer = MediaPlayer.Create(this, voiceChoose[1]);
+                                tvInfo.Text = alternativeText[1];
+                                mediaPlayer.Start();
+                                stateMachine.Fire(Trigger.RollOver);
+                                break;
+                            case 2:
+                                mediaPlayer = MediaPlayer.Create(this, voiceChoose[3]);
+                                tvInfo.Text = alternativeText[3];
+                                mediaPlayer.Start();
+                                stateMachine.Fire(Trigger.RollOver);
+                                break;
+                        }
                     }
                 }
 
@@ -365,13 +401,14 @@ namespace CryingPhone
 
         #endregion
 
+        #region STATE_MACHINE
+
         private void OnWalking()
         {
             Console.WriteLine("OnWalking");
             mainTimer.Dispose();
 
             startTimeWalk = DateTime.Now;
-            timeForWell = 10;
 
             walkTimer = new Timer();
             walkTimer.Start();
@@ -399,18 +436,22 @@ namespace CryingPhone
             {
                 case 1:
                     mediaPlayer = MediaPlayer.Create(this, voiceChoose[4]);
+                    tvInfo.Text = alternativeText[4];
                     mediaPlayer.Start();
                     break;
                 case 2:
                     mediaPlayer = MediaPlayer.Create(this, voiceChoose[5]);
+                    tvInfo.Text = alternativeText[5];
                     mediaPlayer.Start();
                     break;
                 default:
                     mediaPlayer = MediaPlayer.Create(this, voiceChoose[6]);
+                    tvInfo.Text = alternativeText[6];
                     mediaPlayer.Start();
                     break;
             }
             stateMachine.Fire(Trigger.ShockOver);
+            
         }
 
         private void OnRolling()
@@ -440,11 +481,18 @@ namespace CryingPhone
         {
             Console.WriteLine("Well Done! Game Finish");
             mediaPlayer = MediaPlayer.Create(this, voiceChoose[9]);
+            tvInfo.Text = alternativeText[9];
             mediaPlayer.Start();
             stateMachine.Fire(Trigger.Go);
             Console.WriteLine("Game Restart");
+            // reinitialize value
+            shockCount = 0;
+            rollCount = 0;
+            gameAlreadyLaunch = false;
             MainLoop();
         }
+
+        #endregion
 
         #region UTILS
 
@@ -471,11 +519,25 @@ namespace CryingPhone
 
             double gyro = (Math.Abs(gyroscopeReader.gyroX) + Math.Abs(gyroscopeReader.gyroY) + Math.Abs(gyroscopeReader.gyroZ)) * 100;
 
-            if ((Math.Abs(pitch) + Math.Abs(roll) < 2) && (gyro < 1))
+            if (gyro < 2)
             {
                 result = true;
             }
             return result;
+        }
+
+        public async void Delay3s()
+        {
+            Console.WriteLine("Delay3s()");
+            await Task.Delay(3000);
+
+        }
+
+        private void onTransitionAction(StateMachine<StateMach, Trigger>.Transition obj)
+        {
+            Console.WriteLine("Changement Etat " + stateMachine.State);
+            Console.WriteLine("nombre Changement Etat " + nbChangeState);
+            nbChangeState++;
         }
 
         #endregion

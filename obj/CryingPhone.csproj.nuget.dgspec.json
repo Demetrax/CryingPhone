@@ -1,24 +1,24 @@
 {
   "format": 1,
   "restore": {
-    "H:\\DEV\\CryingPhone\\CryingPhone\\CryingPhone.csproj": {}
+    "E:\\DEV\\CryingPhone\\CryingPhone\\CryingPhone.csproj": {}
   },
   "projects": {
-    "H:\\DEV\\CryingPhone\\CryingPhone\\CryingPhone.csproj": {
+    "E:\\DEV\\CryingPhone\\CryingPhone\\CryingPhone.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "H:\\DEV\\CryingPhone\\CryingPhone\\CryingPhone.csproj",
+        "projectUniqueName": "E:\\DEV\\CryingPhone\\CryingPhone\\CryingPhone.csproj",
         "projectName": "CryingPhone",
-        "projectPath": "H:\\DEV\\CryingPhone\\CryingPhone\\CryingPhone.csproj",
-        "packagesPath": "C:\\Users\\AURIOLAymeric\\.nuget\\packages\\",
-        "outputPath": "H:\\DEV\\CryingPhone\\CryingPhone\\obj\\",
+        "projectPath": "E:\\DEV\\CryingPhone\\CryingPhone\\CryingPhone.csproj",
+        "packagesPath": "C:\\Users\\aurio\\.nuget\\packages\\",
+        "outputPath": "E:\\DEV\\CryingPhone\\CryingPhone\\obj\\",
         "projectStyle": "PackageReference",
         "skipContentFileWrite": true,
         "fallbackFolders": [
           "C:\\Microsoft\\Xamarin\\NuGet\\"
         ],
         "configFilePaths": [
-          "C:\\Users\\AURIOLAymeric\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\aurio\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
         ],

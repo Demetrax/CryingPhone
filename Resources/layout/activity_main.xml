@@ -11,13 +11,13 @@
     android:id="@+id/linearLayout1">
     <TextView
         android:text="Text"
-        android:layout_width="142.5dp"
+        android:layout_width="382.5dp"
         android:layout_height="35.5dp"
         android:minWidth="25px"
         android:minHeight="25px"
         android:textStyle="bold"
         android:id="@+id/tvAppName"
-        android:textSize="24dp" />
+        android:textSize="18dp" />
     <Button
         android:text="Voice 01"
         android:layout_width="match_parent"
@@ -30,9 +30,16 @@
         android:layout_height="wrap_content"
         android:id="@+id/btnVoice02"
         android:layout_margin="25px"/>
+    <Button
+        android:text="Voice OFF"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/btnVoiceOff"
+        android:layout_margin="25px"/>
     <TextView
         android:text="Text"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/tvInfo" />
+        android:id="@+id/tvInfo"
+        android:textSize="16dp"/>
 </LinearLayout>
